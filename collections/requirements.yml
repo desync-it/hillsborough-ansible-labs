@@ -1,0 +1,4 @@
+collections:
+  - name: https://github.com/desync-it/hillsborough-collection.git
+    type: git
+    version: main  

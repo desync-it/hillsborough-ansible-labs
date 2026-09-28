@@ -210,3 +210,4 @@ __Now we can Clone the lab, collection and container repository__
 2. [collection/hillsborough-collection](https://github.com/desync-it/hillsborough-collection)
 3. [Git Glossary](https://git-scm.com/docs/gitglossary)
 4. [About Ansible Lint](https://docs.ansible.com/projects/lint)
+5. [Ansible docs: Using variables](https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_variables.html#using-variables)

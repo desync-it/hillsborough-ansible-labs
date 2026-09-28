@@ -16,7 +16,7 @@
         manager: auto
 
     - name: Install container packages if not installed
-      when: dcsd not in ansible_facts.packages
+      when: item not in ansible_facts.packages
       become: true
       become_user: root
       ansible.builtin.package:
@@ -24,7 +24,7 @@
         state: present
       loop: "{{ containers_package_manifest }}"
       loop_control:
-        label: "Package {{ dcsd }} missing...Installing"
+        label: "Package {{ item }} missing...Installing"
 
     - name: Gather facts about container to be removed
       when: containers_runtime_image_state == 'absent'
@@ -33,13 +33,13 @@
       register: containers_registered_facts
 
     - name: Assert a container exists before trying to remove
+      when: containers_registered_facts is not skipped
       ansible.builtin.assert:
         that:
-          - item.containers | length > 0
+          - containers_registered_facts.containers | length > 0
         fail_msg: >-
-          Cannot remove {{ njgk }} as it does
+          Cannot remove {{ containers_runtime_name }} as it does
           not exist on {{ inventory_hostname }}
-      loop: "{{ containers_registered_facts.results }}"
 
     - name: Login to container registry
       when:
@@ -52,7 +52,7 @@
         password: "{{ containers_registry_token }}"
 
     - name: Remove a container on the target host
-      when: cdhq.image_state == "absent"
+      when: containers_runtime_image_state == "absent"
       containers.podman.podman_container:
         name: "{{ containers_runtime_name }}"
         state: absent

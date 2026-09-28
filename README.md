@@ -2,7 +2,6 @@
 
 This lab covers the basics of Ansible with a git setup portion
 
-
 ## Introduction
 
 Before we get into configuring and deploying ansible we need to get familiar with git
@@ -40,8 +39,6 @@ Before we get into configuring and deploying ansible we need to get familiar wit
   description: Bring the contents of another branch into another branch.
 
 ```
-
-Reference [gitglossary - A Git Glossary](https://git-scm.com/docs/gitglossary)
 
 #### Basic commands
 
@@ -91,3 +88,8 @@ $ git clone https://github.com/desync-it/hillsborough-ansible-labs.git
 # Clone via ssh
 $ git clone git@github.com:desync-it/hillsborough-ansible-labs.git
 ```
+
+##### References
+1. [container/hillsborough-webserver](https://github.com/desync-it/hillsborough-webserver)
+2. [collection/hillsborough-collection](https://github.com/desync-it/hillsborough-collection)
+3. [Git Glossary](https://git-scm.com/docs/gitglossary)

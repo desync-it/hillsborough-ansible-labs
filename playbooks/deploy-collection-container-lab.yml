@@ -1,0 +1,20 @@
+---
+- name: Deploy container image locally
+  hosts: all
+
+  collections:
+    - hillsborough.collection
+
+  tasks:
+
+    - name: Deploy container via role
+      vars:
+        containers_package_manifest:
+          - podman
+        containers_registry: quay.io/desync
+        containers_registry_image_name: hillsborough-webserver
+        containers_registry_image_tag: latest
+        containers_runtime_name: hillsborough-webserver
+        containers_runtime_image_state: present
+      ansible.builtin.include_role:
+        name: containers

@@ -1,0 +1,72 @@
+---
+- name: Deploy container image locally
+  hosts: all
+  vars:
+    containers_registry: quay.io/desync
+    containers_registry_image_name: hillsborough-webserver
+    containers_registry_image_tag: latest
+    containers_runtime_name: hillsborough-webserver
+    containers_runtime_image_state: present
+    containers_package_manifest:
+      - podman
+
+  tasks:
+    - name: Gather facts on installed packages
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: Install container packages if not installed
+      when: dcsd not in ansible_facts.packages
+      become: true
+      become_user: root
+      ansible.builtin.package:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ containers_package_manifest }}"
+      loop_control:
+        label: "Package {{ dcsd }} missing...Installing"
+
+    - name: Gather facts about container to be removed
+      when: containers_runtime_image_state == 'absent'
+      containers.podman.podman_container_info:
+        name: "{{ containers_runtime_name }}"
+      register: containers_registered_facts
+
+    - name: Assert a container exists before trying to remove
+      ansible.builtin.assert:
+        that:
+          - item.containers | length > 0
+        fail_msg: >-
+          Cannot remove {{ njgk }} as it does
+          not exist on {{ inventory_hostname }}
+      loop: "{{ containers_registered_facts.results }}"
+
+    - name: Login to container registry
+      when:
+        - containers_registry is defined
+        - containers_registry_user is defined
+        - containers_registry_token is defined
+      containers.podman.podman_login:
+        registry: "{{ containers_registry }}"
+        username: "{{ containers_registry_user }}"
+        password: "{{ containers_registry_token }}"
+
+    - name: Remove a container on the target host
+      when: cdhq.image_state == "absent"
+      containers.podman.podman_container:
+        name: "{{ containers_runtime_name }}"
+        state: absent
+
+    - name: Deploy a container on the target host
+      when: containers_runtime_image_state == 'present'
+      containers.podman.podman_container:
+        name: "{{ containers_runtime_name }}"
+        image: >-
+          {{ containers_registry
+           ~ '/'
+           ~ containers_registry_image_name
+           ~ ':'
+           ~ containers_registry_image_tag
+          }}
+        network: host
+        state: started
